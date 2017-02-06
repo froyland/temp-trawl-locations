@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Fish Screening Level Trawl Locations</title>
+	<meta charset="utf-8" />
+
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<link rel="stylesheet" href="https://npmcdn.com/leaflet@1.0.0-rc.3/dist/leaflet.css" />
+	
+</head>
+<body style="margin:auto;">	
+	<div>		
+		<div id="map" style="width: 100vw; height: 100vh"></div>		
+	</div>		
+	<script src="https://npmcdn.com/leaflet@1.0.0-rc.3/dist/leaflet.js"></script>
+	<script src="./leaflet.ajax.min.js"></script>
+
+	
+
+	<script>
+		var base = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+			attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+		});
+
+		var style = {
+			style1: {
+				'fillColor': '#0571b0'
+			},
+		 style2: {
+				'fillColor': '#92c5de'
+			}
+		}
+
+		var markerOpts = {
+			radius: 10,
+			fillColor: '#e63021',
+			color: '#000',
+			weight: 2,
+			opacity: 1,
+			fillOpacity: 0.8
+		};
+		
+		// import data
+		// points
+		var trawlLocs = new L.GeoJSON.AJAX('json/trawlLocations.geojson',
+			{
+				pointToLayer: function(feature, latlng){
+					var options = markerOpts;
+					switch (feature.properties.StationID){
+						case 'ELLTBAY':
+							options.fillColor = '#d6604d',
+							options.color = '#fff'
+							break;
+						case 'ELLTBAY1':
+							options.fillColor = '#f4a582',
+							options.color = '#fff'
+							break;
+						case 'ELLTBAY2':
+							options.fillColor = '#fddbc7',
+							options.color = '#fff'
+							break;
+						case 'ELLTBAY3':
+							options.fillColor = '#d1e5f0',
+							options.color = '#fff'
+							break;
+						case 'ELLTBAY4':
+							options.fillColor = '#92c5de',
+							options.color = '#fff'
+							break;
+						case 'ELLTBAY5':
+							options.fillColor = '#4393c3',
+							options.color = '#fff'
+							break;
+						case 'SCLINLET':
+							options.fillColor = '#d6604d',
+							options.color = '#7fbc41'
+							break;
+						case 'SCLINLT1':
+							options.fillColor = '#f4a582',
+							options.color = '#7fbc41'
+							break;
+						case 'SCLINLT2':
+							options.fillColor = '#fddbc7',
+							options.color = '#7fbc41'
+							break;
+						case 'SCLINLT3':
+							options.fillColor = '#d1e5f0',
+							options.color = '#7fbc41'
+							break;
+						case 'SCLINLT4':
+							options.fillColor = '#92c5de',
+							options.color = '#7fbc41'
+							break;
+						case 'SCLINLT5':
+							options.fillColor = '#4393c3',
+							options.color = '#7fbc41'
+							break;
+						default:
+							options.fillColor = '#e41a1c'
+							options.color = '#000'
+					}
+
+					return L.circleMarker(latlng, options)
+				},
+				onEachFeature: function(feature, layer){
+					var content = '<p>Description: <strong>' + feature.properties.StationDescription + '</strong><br />Station Id: <strong>' + feature.properties.StationID + '</strong><br />Year: <strong>' + feature.properties.Year_ + '</strong>'
+					if(feature.properties.Field7 !== undefined) content += '<br />Misc: <strong>' + feature.properties.Field7 + '</strong>'
+					content += '</p>'
+					layer.bindPopup(content)
+				}				
+		});
+		
+			
+		var basemaps = {
+			"basemap" : base
+		}
+
+		var data = {
+			"<strong>Trawl Locations</strong>": trawlLocs,			
+		}
+		
+		var map = L.map('map', {
+			center: [48, -122.51],
+			zoom: 8,	
+			layers: [base, trawlLocs]		
+		});
+		
+		// layer selection
+		L.control.scale({
+			maxWidth: 200
+		}).addTo(map)	
+		
+		
+		
+		
+		
+
+	</script>
+</body>
+</html>
