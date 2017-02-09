@@ -2,6 +2,7 @@
 <html>
 <head>
 	<title>Fish Screening Level Trawl Locations</title>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta charset="utf-8" />
 
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -40,6 +41,24 @@
 			opacity: 1,
 			fillOpacity: 0.8
 		};
+
+		var eimMarker = {
+				radius: 5,
+				fillColor: '#ffff99',
+				color: '#000',
+				weight: 2,
+				opacity: 1,
+				fillOpacity: 0.8
+			};
+
+		var eimMarkerNoDepth = {
+				radius: 5,
+				fillColor: '#ff7f00',
+				color: '#000',
+				weight: 2,
+				opacity: 1,
+				fillOpacity: 0.8
+			};
 		
 		// import data
 		// points
@@ -111,6 +130,29 @@
 				}				
 		});
 		
+		var eim = new L.GeoJSON.AJAX('json/SinclairInletEimFiltered.geojson',
+			{
+				pointToLayer: function(feature, latlng){					
+					return L.circleMarker(latlng, eimMarker)
+				},
+				onEachFeature: function(feature, layer){
+					var content = '<p>StudyId: <strong>' + feature.properties.StudyID + '</strong><br />Location Id: <strong>' + feature.properties.LocationID + '</strong><br />PAH: <strong>' + feature.properties.ChemicalConc + ' ppm</strong><br />Depth: <strong>' + feature.properties.UpperDepth + '-' + feature.properties.LowerDepth + ' ' + feature.properties.DepthUOM + '</strong>'
+					content += '</p>'
+					layer.bindPopup(content)
+				}				
+		});
+
+		var eimNoDepth = new L.GeoJSON.AJAX('json/SinclairInletEimFilteredNoDepth.geojson',
+			{
+				pointToLayer: function(feature, latlng){					
+					return L.circleMarker(latlng, eimMarkerNoDepth)
+				},
+				onEachFeature: function(feature, layer){
+					var content = '<p>StudyId: <strong>' + feature.properties.StudyID + '</strong><br />Location Id: <strong>' + feature.properties.LocationID + '</strong><br />PAH: <strong>' + feature.properties.ChemicalConc + ' ppm</strong><br />Depth: <strong>No Depth Info</strong>'
+					content += '</p>'
+					layer.bindPopup(content)
+				}				
+		});
 			
 		var basemaps = {
 			"basemap" : base
@@ -121,9 +163,9 @@
 		}
 		
 		var map = L.map('map', {
-			center: [48, -122.51],
-			zoom: 8,	
-			layers: [base, trawlLocs]		
+			center: [47.549597, -122.651498],
+			zoom: 14,	
+			layers: [base, eim, eimNoDepth, trawlLocs]		
 		});
 		
 		// layer selection
