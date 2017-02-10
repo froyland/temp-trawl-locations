@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Fish Screening Level Trawl Locations</title>
+	<title>Trawl Locations</title>
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta charset="utf-8" />
 
@@ -12,7 +12,7 @@
 </head>
 <body style="margin:auto;">	
 	<div>		
-		<div id="map" style="width: 100vw; height: 100vh"></div>		
+		<div id="map" style="width: 100vw; height: 100vh; display: flex;"></div>		
 	</div>		
 	<script src="https://npmcdn.com/leaflet@1.0.0-rc.3/dist/leaflet.js"></script>
 	<script src="./leaflet.ajax.min.js"></script>
@@ -42,7 +42,7 @@
 			fillOpacity: 0.8
 		};
 
-		var eimMarker = {
+		var eimMarkerDepth = {
 				radius: 5,
 				fillColor: '#ffff99',
 				color: '#000',
@@ -130,28 +130,36 @@
 				}				
 		});
 		
-		var eim = new L.GeoJSON.AJAX('json/SinclairInletEimFiltered.geojson',
+		var eimDepth = new L.GeoJSON.AJAX('json/EIMFiltered02_09_17.geojson',
 			{
 				pointToLayer: function(feature, latlng){					
-					return L.circleMarker(latlng, eimMarker)
+					return L.circleMarker(latlng, eimMarkerDepth)
 				},
 				onEachFeature: function(feature, layer){
-					var content = '<p>StudyId: <strong>' + feature.properties.StudyID + '</strong><br />Location Id: <strong>' + feature.properties.LocationID + '</strong><br />PAH: <strong>' + feature.properties.ChemicalConc + ' ppm</strong><br />Depth: <strong>' + feature.properties.UpperDepth + '-' + feature.properties.LowerDepth + ' ' + feature.properties.DepthUOM + '</strong>'
-					content += '</p>'
+					var content = '<p>StudyId: <strong>' + feature.properties.StudyID + '</strong><br />'
+						+ 'Sampling Date: <strong>' + feature.properties.Sampling_Date + '</strong><br />'
+						+ 'Depth: <strong>' + feature.properties.UpperDepth + '-' + feature.properties.LowerDepth + ' ' + feature.properties.DepthUOM + '</strong><br />'
+						+ 'Sample IDs: <strong>' + feature.properties.SampleIDs + '</strong><br />'
+						+ 'PAH: <strong>' + feature.properties.ChemicalConc + ' ppm</strong>'
+						+ '</p>' 					
 					layer.bindPopup(content)
 				}				
 		});
 
-		var eimNoDepth = new L.GeoJSON.AJAX('json/SinclairInletEimFilteredNoDepth.geojson',
+		var eimNoDepth = new L.GeoJSON.AJAX('json/EIMFilteredNoDepth02_09_17.geojson',
 			{
 				pointToLayer: function(feature, latlng){					
 					return L.circleMarker(latlng, eimMarkerNoDepth)
 				},
 				onEachFeature: function(feature, layer){
-					var content = '<p>StudyId: <strong>' + feature.properties.StudyID + '</strong><br />Location Id: <strong>' + feature.properties.LocationID + '</strong><br />PAH: <strong>' + feature.properties.ChemicalConc + ' ppm</strong><br />Depth: <strong>No Depth Info</strong>'
-					content += '</p>'
+					var content = '<p>StudyId: <strong>' + feature.properties.StudyID + '</strong><br />'
+						+ 'Sampling Date: <strong>' + feature.properties['SamplingDate'] + '</strong><br />'
+						+ 'Depth: <strong>No Depth Info</strong><br />'
+						+ 'Sample IDs: <strong>' + feature.properties.SampleIDs + '</strong><br />'
+						+ 'PAH: <strong>' + feature.properties.ChemicalConc + ' ppm</strong>'
+						+ '</p>' 					
 					layer.bindPopup(content)
-				}				
+				}			
 		});
 			
 		var basemaps = {
@@ -163,21 +171,26 @@
 		}
 		
 		var map = L.map('map', {
-			center: [47.549597, -122.651498],
-			zoom: 14,	
-			layers: [base, eim, eimNoDepth, trawlLocs]		
+			center: [48, -122.651498],
+			zoom: 8,	
+			layers: [base, eimDepth, eimNoDepth, trawlLocs]		
 		});
 		
+		var layers = {
+			'<svg width="30" height="30"><circle cx="15" cy="18" r="10" stroke="black" stroke-width="1.5" fill="red" /></svg><span>Trawl Locations (various colors)</span>': trawlLocs,
+			'<svg width="25" height="20"><circle cx="15" cy="13" r="5" stroke="black" stroke-width="2" fill="#ffff99" /></svg><span>EIM Locations With Depth</span>': eimDepth,
+			'<svg width="25" height="20"><circle cx="15" cy="13" r="5" stroke="black" stroke-width="2" fill="#ff7f00" /></svg><span>EIM Locations Without Depth</span>': eimNoDepth
+		}
+
+		L.control.layers(basemaps, layers, {
+			'collapsed': false,
+			'hideSingleBase': true
+		}).addTo(map);
+
 		// layer selection
 		L.control.scale({
 			maxWidth: 200
 		}).addTo(map)	
-		
-		
-		
-		
-		
-
 	</script>
 </body>
 </html>
